@@ -1,11 +1,14 @@
-
-from fastapi import FastAPI, File, UploadFile, HTTPException, status
-from fastapi.responses import JSONResponse
+# file src/main.py
+import io
 
 import boto3
 from botocore.exceptions import NoCredentialsError
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from fastapi.responses import JSONResponse
+from PIL import Image
 
 from src.config import settings
+from src.utils import resize_and_compress_image
 
 app = FastAPI()
 
@@ -20,17 +23,29 @@ async def upload_image(file: UploadFile = File(...)):
     if file.content_type not in ["image/jpeg", "image/png"]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only jpeg and png images allowed")
 
-    content = await file.read()
-    size = len(content)
-    print("size: ", size)
-    file.file.seek(0)
+    file_contents = await file.read()
 
+    # Check file size
+    size = len(file_contents)
+    print("size: ", size)
     if not 0 < size < 2 * MB:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File size should not exceed 2MB")
 
     try:
         s3 = boto3.client('s3')
-        s3.upload_fileobj(file.file, settings.AWS_BUCKET_NAME, file.filename)
+
+        # Upload the original image to S3
+        s3.upload_fileobj(io.BytesIO(file_contents), settings.AWS_BUCKET_NAME, file.filename)
+
+        # Read the contents of the uploaded file into a BytesIO object
+        image = Image.open(io.BytesIO(file_contents))
+
+        # Resize and compress the uploaded image
+        quality_levels = [75, 50, 25]
+        for quality in quality_levels:
+            compressed_image_data = resize_and_compress_image(image, quality)
+            s3.upload_fileobj(io.BytesIO(compressed_image_data), settings.AWS_BUCKET_NAME,
+                              f"{file.filename}_{quality}.jpg")
 
         return JSONResponse(content={"message": "Image uploaded successfully"})
     except NoCredentialsError:
@@ -57,4 +72,4 @@ async def download_image(filename: str):
 async def root():
     return {"message": "File upload root page 🎬"}
 
-
+# end of file src/main.py

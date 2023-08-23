@@ -1,7 +1,7 @@
 import os
+from tempfile import NamedTemporaryFile
 
 import pytest
-from tempfile import NamedTemporaryFile
 from s3 import MyS3Client
 
 

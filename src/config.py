@@ -1,6 +1,7 @@
 # file src/config.py
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     # AWS S3 configuration
     AWS_ACCESS_KEY: str
