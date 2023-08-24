@@ -1,3 +1,4 @@
+# file service.py
 import io
 
 from botocore.exceptions import NoCredentialsError
@@ -13,7 +14,11 @@ class ImageService:
     def __init__(self, s3_repository: S3Repository):
         self.s3_repository = s3_repository
 
-    def upload_image(self, file: UploadFile):
+    async def download_image_url(self, filename: str) -> str:
+        presigned_url = self.s3_repository.generate_presigned_url(filename)
+        return presigned_url
+
+    async def upload_image(self, file: UploadFile) -> dict:
         if not file:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="No file provided"
@@ -25,7 +30,7 @@ class ImageService:
                 detail="Only jpeg and png images allowed",
             )
 
-        file_contents = file.file.read()
+        file_contents = await file.read()
 
         # Check file size
         size = len(file_contents)
@@ -52,3 +57,6 @@ class ImageService:
             return {"message": "Image uploaded successfully"}
         except NoCredentialsError:
             return {"error": "No AWS credentials found"}
+
+
+# end of file service.py

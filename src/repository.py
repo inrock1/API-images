@@ -1,3 +1,4 @@
+# file repository.py
 import io
 
 import boto3
@@ -18,3 +19,14 @@ class S3Repository:
         self.s3.upload_fileobj(
             io.BytesIO(compressed_image_data), settings.AWS_BUCKET_NAME, filename
         )
+
+    def generate_presigned_url(self, filename: str) -> str:
+        presigned_url = self.s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": settings.AWS_BUCKET_NAME, "Key": filename},
+            ExpiresIn=3600,  # URL expiration time in seconds
+        )
+        return presigned_url
+
+
+# end of file repository.py
