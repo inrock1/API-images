@@ -21,6 +21,7 @@ class S3Repository:
         )
 
     def generate_presigned_url(self, filename: str) -> str:
+
         presigned_url = self.s3.generate_presigned_url(
             "get_object",
             Params={"Bucket": settings.AWS_BUCKET_NAME, "Key": filename},
