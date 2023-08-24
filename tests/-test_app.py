@@ -13,7 +13,9 @@ client = TestClient(app)
 
 # @patch("src.config.settings", AWS_ACCESS_KEY='testing', AWS_SECRET_KEY='testing', AWS_BUCKET_NAME='test-bucket34')
 def test_upload_image():
-    response = client.post("/upload/", files={"file": ("test_image.jpg", open("test_image.jpg", "rb"))})
+    response = client.post(
+        "/upload/", files={"file": ("test_image.jpg", open("test_image.jpg", "rb"))}
+    )
     assert response.status_code == 200
     assert response.json() == {"message": "Image uploaded successfully"}
 
@@ -23,6 +25,7 @@ def test_download_image():
     assert response.status_code == 200
     assert "download_url" in response.json()
 
+
 @mock_s3
 def test_upload_image2():
     # Create a mock S3 bucket
@@ -31,6 +34,9 @@ def test_upload_image2():
     s3.create_bucket(Bucket=mock_bucket_name)
 
     # Perform the upload_image request
-    response = client.post("/upload/", files={"file": ("test_image.jpg", open("tests/test_image.jpg", "rb"))})
+    response = client.post(
+        "/upload/",
+        files={"file": ("test_image.jpg", open("tests/test_image.jpg", "rb"))},
+    )
     assert response.status_code == 200
     assert response.json() == {"message": "Image uploaded successfully"}

@@ -17,4 +17,3 @@ class MyS3Client:
             Prefix=prefix,
         )
         return [object["Key"] for object in response["Contents"]]
-    
