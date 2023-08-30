@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from src.config import settings
 from src.repository import S3Repository
 from src.service import ImageService
+from src.celery import app as celery_app
 
 app = FastAPI()
 
