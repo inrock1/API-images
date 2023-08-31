@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     AWS_BUCKET_NAME: str
     AWS_TEST_BUCKET_NAME: str
 
+    RABBITMQ_URL: str
+
+
     MB: int = 1024 * 1024  # KB
 
     model_config = SettingsConfigDict(env_file=".env")

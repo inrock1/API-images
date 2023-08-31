@@ -1,3 +1,4 @@
+# src/utils.py
 import io
 
 from PIL import Image
@@ -14,3 +15,4 @@ def resize_and_compress_image(image: Image.Image, quality: int) -> bytes:
     compressed_image.seek(0)
 
     return compressed_image.read()
+# end of file src/utils.py

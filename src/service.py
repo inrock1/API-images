@@ -1,13 +1,12 @@
-# file service.py
+# file src/service.py
 import io
 
 from botocore.exceptions import NoCredentialsError
 from fastapi import HTTPException, UploadFile, status
-from PIL import Image
 
 from src.config import settings
 from src.repository import S3Repository
-from src.utils import resize_and_compress_image
+from src.tasks import celery_app
 
 
 class ImageService:
@@ -46,19 +45,19 @@ class ImageService:
 
         try:
             self.s3_repository.upload_original_image(file_contents, file.filename)
-
-            image = Image.open(io.BytesIO(file_contents))
-
-            # Resize and compress the uploaded image
-            for quality in self.quality_levels:
-                compressed_image_data = resize_and_compress_image(image, quality)
-                self.s3_repository.upload_compressed_image(
-                    compressed_image_data, f"{file.filename}_{quality}.jpg"
-                )
+            await self.queue_image_optimization(file_contents, file.filename)
 
             return {"message": "Image uploaded successfully"}
         except NoCredentialsError:
             return {"error": "No AWS credentials found"}
 
+    async def queue_image_optimization(self, file_contents: bytes, filename: str):
 
-# end of file service.py
+        for quality in self.quality_levels:
+            celery_app.send_task(
+                "src.tasks.optimize_image", args=[filename, file_contents, quality]
+            )
+
+        return {"message": "Image optimization queued"}
+
+# end of file src/service.py

@@ -6,7 +6,6 @@ from fastapi.responses import JSONResponse
 from src.config import settings
 from src.repository import S3Repository
 from src.service import ImageService
-from src.celery import app as celery_app
 
 app = FastAPI()
 
@@ -17,6 +16,7 @@ async def upload_image(
 ):
     image_service = ImageService(s3_repository)
     response = await image_service.upload_image(file)
+
     return response
 
 
@@ -45,6 +45,5 @@ async def download_image(
 @app.get("/")
 async def root():
     return {"message": "File upload root page 🎬"}
-
 
 # end of file src/main.py
