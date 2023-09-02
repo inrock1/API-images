@@ -3,5 +3,7 @@ venv/
 __pycache__/
 .pytest_cache/
 tests/.pytest_cache/
+tests/temp/
 .python-version
 .env
+.test.env

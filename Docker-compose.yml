@@ -1,0 +1,27 @@
+version: '3'
+services:
+  app:
+    container_name: app_api_images
+    build:
+      context: .
+    ports:
+      - "80:80"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq
+
+  rabbitmq:
+    container_name: rabbitmq_api_images
+    image: "rabbitmq:3.12-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  celery-worker:
+    container_name: celery_worker_api_images
+    build:
+      context: .
+    depends_on:
+      - rabbitmq
+    command: celery -A src.tasks worker --loglevel=INFO
