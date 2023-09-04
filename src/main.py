@@ -1,18 +1,20 @@
 # file src/main.py
-from fastapi import Depends, FastAPI, File, UploadFile, Query, Path
+from fastapi import Depends, FastAPI, File, Path, Query, UploadFile
 from fastapi.responses import JSONResponse
 
-from src.repository import S3Repository
-from src.service import ImageService
+from src.services.image_service import ImageService
+from src.utils import get_image_service
 
 app = FastAPI()
 
 
 @app.post("/upload/")
 async def upload_image(
-    file: UploadFile = File(...), s3_repository: S3Repository = Depends()
+    file: UploadFile = File(...),
+        # s3_repository: S3Repository = Depends(),
+        image_service: ImageService = Depends(get_image_service)
 ):
-    image_service = ImageService(s3_repository)
+    # image_service = ImageService(s3_repository)
     response = await image_service.upload_image(file)
 
     return response
@@ -20,11 +22,16 @@ async def upload_image(
 
 @app.get("/download/{filename}")
 async def download_image(
-    filename: str = Path(..., description="Filename of the image with extension", regex=".+\.(jpg|jpeg|png)$"),
+    filename: str = Path(
+        ...,
+        description="Filename of the image with extension",
+        regex=".+\.(jpg|jpeg|png)$",
+    ),
     quality: int = Query(
         default=100, description="Image quality level (25, 50, 75, or 100 %)"
     ),
-    s3_repository: S3Repository = Depends(),
+    # s3_repository: S3Repository = Depends(),
+    image_service: ImageService = Depends(get_image_service)
 ):
     if quality not in [25, 50, 75, 100]:
         return JSONResponse(
@@ -32,7 +39,7 @@ async def download_image(
             status_code=400,
         )
 
-    image_service = ImageService(s3_repository)
+    # image_service = ImageService(s3_repository)
     try:
         presigned_url = await image_service.download_image_url(filename, quality)
         return JSONResponse(content={"download_url": presigned_url})

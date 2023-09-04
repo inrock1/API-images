@@ -19,10 +19,3 @@ def s3_client(aws_credentials):
     with mock_s3():
         conn = boto3.client("s3", region_name="us-east-1")
         yield conn
-
-
-@pytest.fixture
-def sqs_client(aws_credentials):
-    with mock_sqs():
-        conn = boto3.client("sqs", region_name="us-east-1")
-        yield conn
