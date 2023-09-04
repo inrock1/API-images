@@ -1,5 +1,6 @@
 # file src/service.py
 import io
+import os
 
 from botocore.exceptions import NoCredentialsError
 from fastapi import HTTPException, UploadFile, status
@@ -15,8 +16,10 @@ class ImageService:
         self.quality_levels = [75, 50, 25]
 
     async def download_image_url(self, filename: str, quality: int) -> str:
+
         if quality in self.quality_levels:
-            filename = f"{filename}_{quality}.jpg"
+            file_name, file_extension = os.path.splitext(filename)
+            filename = f"{file_name}_{quality}{file_extension}"
         presigned_url = self.s3_repository.generate_presigned_url(filename)
         return presigned_url
 
@@ -52,10 +55,13 @@ class ImageService:
             return {"error": "No AWS credentials found"}
 
     async def queue_image_optimization(self, file_contents: bytes, filename: str):
+        file_name, file_extension = os.path.splitext(filename)
 
         for quality in self.quality_levels:
+            compressed_filename = f"{file_name}_{quality}{file_extension}"
+
             celery_app.send_task(
-                "src.tasks.optimize_image", args=[filename, file_contents, quality]
+                "src.tasks.optimize_image", args=[compressed_filename, file_contents, quality]
             )
 
         return {"message": "Image optimization queued"}

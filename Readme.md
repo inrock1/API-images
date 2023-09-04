@@ -44,15 +44,15 @@ git clone https://github.com/inrock1/API-images.git
 cd API-images
 ```
 3. **Put your credentials**:
-   - Rename the `.env.example` file to `.env` and put your AWS S3 credentials in it.   
+   - rename .env.sample to .env and put your credentials in it.
+   - If you don't have ~/.aws/credentials file, rename the `aws_config_sample` file to `config` and put your AWS S3 credentials in it.
 
-
-3. **Build and Run the Docker Containers**:
+4.**Build and Run the Docker Containers**:
 ```shell
 docker-compose up --build
 ```
 
-4. **Access the API**:
+5.**Access the API**:
 - The API will be available at `http://localhost:80` by default.
 - Use `http://localhost:80/docs` to interact with the API endpoints.
 

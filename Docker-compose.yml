@@ -8,8 +8,11 @@ services:
       - "80:80"
     depends_on:
       - rabbitmq
-    environment:
-      - RABBITMQ_URL=amqp://rabbitmq
+    volumes:
+      - ./config:/root/.aws/config
+      - ~/.aws:/root/.aws
+    env_file:
+      - .env
 
   rabbitmq:
     container_name: rabbitmq_api_images

@@ -1,9 +1,7 @@
 # file src/main.py
-import boto3
 from fastapi import Depends, FastAPI, File, UploadFile, Query, Path
 from fastapi.responses import JSONResponse
 
-from src.config import settings
 from src.repository import S3Repository
 from src.service import ImageService
 

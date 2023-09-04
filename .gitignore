@@ -7,3 +7,4 @@ tests/temp/
 .python-version
 .env
 .test.env
+aws_config

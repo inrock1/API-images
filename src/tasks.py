@@ -20,7 +20,7 @@ def optimize_image(filename, file_contents: bytes, quality: int):
     image = Image.open(io.BytesIO(file_contents))
     compressed_image_data = resize_and_compress_image(image, quality)
     s3_repository.upload_compressed_image(
-        compressed_image_data, f"{filename}_{quality}.jpg"
+        compressed_image_data, filename
     )
     print(f"Optimized image {filename} with quality {quality}")
 
