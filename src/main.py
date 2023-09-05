@@ -2,8 +2,8 @@
 from fastapi import Depends, FastAPI, File, Path, Query, UploadFile
 from fastapi.responses import JSONResponse
 
+from src.services.get_service import get_image_service
 from src.services.image_service import ImageService
-from src.utils import get_image_service
 
 app = FastAPI()
 
@@ -11,10 +11,8 @@ app = FastAPI()
 @app.post("/upload/")
 async def upload_image(
     file: UploadFile = File(...),
-        # s3_repository: S3Repository = Depends(),
-        image_service: ImageService = Depends(get_image_service)
+    image_service: ImageService = Depends(get_image_service),
 ):
-    # image_service = ImageService(s3_repository)
     response = await image_service.upload_image(file)
 
     return response
@@ -30,8 +28,7 @@ async def download_image(
     quality: int = Query(
         default=100, description="Image quality level (25, 50, 75, or 100 %)"
     ),
-    # s3_repository: S3Repository = Depends(),
-    image_service: ImageService = Depends(get_image_service)
+    image_service: ImageService = Depends(get_image_service),
 ):
     if quality not in [25, 50, 75, 100]:
         return JSONResponse(
@@ -39,7 +36,6 @@ async def download_image(
             status_code=400,
         )
 
-    # image_service = ImageService(s3_repository)
     try:
         presigned_url = await image_service.download_image_url(filename, quality)
         return JSONResponse(content={"download_url": presigned_url})
@@ -50,5 +46,6 @@ async def download_image(
 @app.get("/")
 async def root():
     return {"message": "File upload root page 🎬"}
+
 
 # end of file src/main.py

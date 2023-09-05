@@ -1,5 +1,4 @@
 # file src/service.py
-import io
 import os
 
 from botocore.exceptions import NoCredentialsError
@@ -11,8 +10,8 @@ from src.tasks import celery_app
 
 
 class ImageService:
-    def __init__(self):
-        self.s3_repository = S3Repository
+    def __init__(self, s3_repository: S3Repository):
+        self.s3_repository = s3_repository
         self.quality_levels = [75, 50, 25]
 
     async def download_image_url(self, filename: str, quality: int) -> str:

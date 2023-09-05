@@ -24,4 +24,5 @@ def optimize_image(filename: str, file_contents: bytes, quality: int):
     s3_repository.upload_compressed_image(compressed_image_data, filename)
     print(f"Optimized image {filename} with quality {quality}")
 
+
 # end of file src/tasks.py
